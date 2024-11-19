@@ -15,22 +15,15 @@ app = flask.Flask(__name__)
 GA_PROPERTY_ID = os.getenv('GA_PROPERTY_ID')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
-# Print the contents of /etc/secrets to ensure the file is present
-print("Checking for available files in /etc/secrets...")
+# Load service account credentials from environment variable
 try:
-    for filename in os.listdir('/etc/secrets'):
-        print(f"Found file: {filename}")
-except FileNotFoundError:
-    print("Error: /etc/secrets directory not found.")
-
-# Path to the secret file containing your Google service account credentials
-credentials_path = '/etc/secrets/google-credentials.json'
-
-# Load service account credentials from the secret file
-try:
-    with open(credentials_path) as f:
-        credentials_info = json.load(f)
+    credentials_json = os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON')
+    if credentials_json:
+        credentials_info = json.loads(credentials_json)
         credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    else:
+        print("Error: GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable not found.")
+        exit(1)
 except Exception as e:
     print(f"Error loading service account credentials: {e}")
     exit(1)
