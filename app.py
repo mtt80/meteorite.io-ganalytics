@@ -11,19 +11,19 @@ from google.oauth2 import service_account
 
 app = flask.Flask(__name__)
 
+# Basic route to avoid 404 error
+@app.route('/')
+def home():
+    return "Service is up and running!"
+
 # Load environment variables
 GA_PROPERTY_ID = os.getenv('GA_PROPERTY_ID')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 # Load service account credentials from environment variable
 try:
-    credentials_json = os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON')
-    if credentials_json:
-        credentials_info = json.loads(credentials_json)
-        credentials = service_account.Credentials.from_service_account_info(credentials_info)
-    else:
-        print("Error: GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable not found.")
-        exit(1)
+    credentials_info = json.loads(os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON'))
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
 except Exception as e:
     print(f"Error loading service account credentials: {e}")
     exit(1)
@@ -80,7 +80,13 @@ def manual_trigger():
     return "Triggered!", 200
 
 def run_scheduler():
+    """Scheduler that runs the job immediately after deployment and then every 10 minutes."""
+    # Run the analytics job immediately after deployment
+    analytics_job()
+
+    # Schedule to run the job every 10 minutes
     schedule.every(10).minutes.do(analytics_job)
+
     while True:
         schedule.run_pending()
         time.sleep(60)
