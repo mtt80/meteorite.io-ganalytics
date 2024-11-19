@@ -108,7 +108,7 @@ def analytics_job():
 def manual_trigger():
     logger.info("Manual trigger endpoint called")
     analytics_job()
-    return "Triggered!", 200
+    return "Triggered! Analytics job has been completed.", 200
 
 def run_scheduler():
     """Scheduler that runs the job immediately after deployment and then every 10 minutes."""
@@ -130,5 +130,5 @@ if __name__ == '__main__':
     scheduler_thread.daemon = True  # Make thread daemon so it exits when main thread exits
     scheduler_thread.start()
     
-    # Run Flask app
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 10000)))
+    # Run Flask app on Render with explicit debug mode
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 10000)), debug=True)
