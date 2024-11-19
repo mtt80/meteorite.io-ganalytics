@@ -15,8 +15,15 @@ app = flask.Flask(__name__)
 GA_PROPERTY_ID = os.getenv('GA_PROPERTY_ID')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
+# Print the contents of /etc/secrets to ensure the file is present
+print("Checking for available files in /etc/secrets...")
+try:
+    for filename in os.listdir('/etc/secrets'):
+        print(f"Found file: {filename}")
+except FileNotFoundError:
+    print("Error: /etc/secrets directory not found.")
+
 # Path to the secret file containing your Google service account credentials
-# In Render, secret files are available in /etc/secrets by default
 credentials_path = '/etc/secrets/google-credentials.json'
 
 # Load service account credentials from the secret file
