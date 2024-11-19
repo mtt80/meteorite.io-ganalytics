@@ -38,9 +38,9 @@ if not all([GA_PROPERTY_ID, DISCORD_WEBHOOK_URL, CREDENTIALS_JSON]):
     logger.error("Required environment variables are missing")
     exit(1)
 
-# Load service account credentials
+# Load service account credentials from the environment variable
 try:
-    credentials_info = json.loads(CREDENTIALS_JSON)
+    credentials_info = json.loads(CREDENTIALS_JSON)  # Parse the JSON string
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
     logger.info("Successfully loaded service account credentials")
 except json.JSONDecodeError as e:
