@@ -9,12 +9,19 @@ import logging
 from google.analytics.data import BetaAnalyticsDataClient
 from google.analytics.data_v1beta import RunReportRequest
 from google.oauth2 import service_account
+from flask import request, redirect
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = flask.Flask(__name__)
+
+# Redirect all HTTP requests to HTTPS
+@app.before_request
+def redirect_to_https():
+    if not request.is_secure:
+        return redirect(request.url.replace("http://", "https://", 1))
 
 # Basic route to avoid 404 error
 @app.route('/')
@@ -38,9 +45,9 @@ if not all([GA_PROPERTY_ID, DISCORD_WEBHOOK_URL, CREDENTIALS_JSON]):
     logger.error("Required environment variables are missing")
     exit(1)
 
-# Load service account credentials from the environment variable
+# Load service account credentials
 try:
-    credentials_info = json.loads(CREDENTIALS_JSON)  # Parse the JSON string
+    credentials_info = json.loads(CREDENTIALS_JSON)
     credentials = service_account.Credentials.from_service_account_info(credentials_info)
     logger.info("Successfully loaded service account credentials")
 except json.JSONDecodeError as e:
