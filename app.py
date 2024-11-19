@@ -15,10 +15,15 @@ app = flask.Flask(__name__)
 GA_PROPERTY_ID = os.getenv('GA_PROPERTY_ID')
 DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
-# Load service account credentials from environment variable
+# Path to the secret file containing your Google service account credentials
+# In Render, secret files are available in /etc/secrets by default
+credentials_path = '/etc/secrets/google-credentials.json'
+
+# Load service account credentials from the secret file
 try:
-    credentials_info = json.loads(os.getenv('GOOGLE_APPLICATION_CREDENTIALS_JSON'))
-    credentials = service_account.Credentials.from_service_account_info(credentials_info)
+    with open(credentials_path) as f:
+        credentials_info = json.load(f)
+        credentials = service_account.Credentials.from_service_account_info(credentials_info)
 except Exception as e:
     print(f"Error loading service account credentials: {e}")
     exit(1)
